@@ -14,7 +14,7 @@ public class DefaultErrorProxy extends AbstractUIProxy {
 	
 	public void run() {
 		JOptionPane.showMessageDialog(this.frame,
-			    this.getResponseMapper().getError(),"Запрос к серверу завершился ошибкой",JOptionPane.ERROR_MESSAGE);		
+			    this.getResponseMapper().getError(),"Error message",JOptionPane.ERROR_MESSAGE);		
 	}
 
 }

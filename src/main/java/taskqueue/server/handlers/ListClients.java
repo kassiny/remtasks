@@ -1,6 +1,7 @@
 package taskqueue.server.handlers;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import org.json.simple.JSONArray;
 
 import taskqueue.server.Server;
 import taskqueue.server.client.Client;
+import taskqueue.server.manager.ClientManager;
 
 
 public class ListClients extends AbstractHandler {
@@ -22,24 +24,23 @@ public class ListClients extends AbstractHandler {
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		
-		Server server = this.getTaskQServer();
 		
-		Client client = server.getClientHeader(request);
+		
+		Client client = this.getClient(request);
+		
 		if(!(client instanceof Client) || !client.isAdmin()) {
-			server.respondHTTP400(response);
-			response.getWriter().println("Admin only");
+			this.respondHTTP400(response,"Admin only");
 			baseRequest.setHandled(true);
 			return;			
 		}
 		
 		JSONArray answer = new JSONArray();
 		
-		for(Enumeration<UUID> clientsID = server.getAllClients();
-				clientsID.hasMoreElements();) {
-				answer.add(clientsID.nextElement().toString());
-		}
+		answer.addAll(Collections.list(
+				((ClientManager) this.getServer().getBean(ClientManager.class)).getAllClients())
+			);
 		
-		server.respondJSON(answer, response);
+		this.respondJSON(answer, response);
 		
 		baseRequest.setHandled(true);
 		

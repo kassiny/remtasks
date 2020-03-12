@@ -9,6 +9,7 @@ import org.json.simple.JSONArray;
 
 import org.eclipse.jetty.server.Request;
 import taskqueue.server.Server;
+import taskqueue.server.manager.ClientManager;
 
 public class RegisterClient extends AbstractHandler{
 
@@ -19,12 +20,13 @@ public class RegisterClient extends AbstractHandler{
 			HttpServletResponse response)
 			throws IOException, ServletException {
 		
-		Server server = this.getTaskQServer();
-		String clientId = server.registerClient();
+		//String clientId = server.registerClient();
+		String clientId = ((ClientManager) this.getServer().getBean(ClientManager.class)).registerClient();
+	
 		response.setContentType("application/json");
 		JSONArray answer = new JSONArray();
 		answer.add(clientId);
-		server.respondJSON(answer, response);
+		this.respondJSON(answer, response);
 		
 		baseRequest.setHandled(true);
 	}

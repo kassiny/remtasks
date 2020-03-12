@@ -18,12 +18,10 @@ public class CheckAuth extends AbstractHandler{
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		
-		Server server = this.getTaskQServer();
-		Client client = server.getClientHeader(request);
+		Client client = this.getClient(request);
 
 		if(!(client instanceof Client)) {
-			server.respondHTTP400(response);
-			response.getWriter().println("Error");
+			this.respondHTTP400(response,"Error");
 			baseRequest.setHandled(true);
 			return;
 		}
@@ -31,9 +29,8 @@ public class CheckAuth extends AbstractHandler{
 		JSONObject answer = new JSONObject();
 		answer.put("ClientID", client.getId().toString());
 		answer.put("isAdmin",client.isAdmin());
-		server.respondJSON(answer, response);
+		this.respondJSON(answer, response);
 		baseRequest.setHandled(true);
-		
 	}
 
 }

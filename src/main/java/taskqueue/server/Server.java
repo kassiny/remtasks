@@ -8,12 +8,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 import java.util.UUID;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.json.simple.JSONAware;
 
 import simple.embedding.jetty.HelloWorld;
 import taskqueue.server.client.Client;
+import taskqueue.server.events.CreateClientFolderOnRegister;
+import taskqueue.server.events.Listener;
+import taskqueue.server.manager.ClientManager;
+import taskqueue.server.manager.FileManager;
 
 import org.eclipse.jetty.util.log.Log;
 
@@ -29,72 +34,53 @@ public class Server extends org.eclipse.jetty.server.Server {
 	}
 	 
 	public void initializeContexts() {
-		ContextHandlerCollection collection = new ContextHandlerCollection();
-		ContextHandler context;
 		
-		context = new ContextHandler("/hello");
-		context.setHandler(new HelloWorld("<h1> Hello world </h1>"));
-		collection.addHandler(context);
+		ClientManager cm = new ClientManager();
+		FileManager fm = new FileManager("clientData");
 		
-		context = new ContextHandler("/register");
-		context.setHandler(new taskqueue.server.handlers.RegisterClient());
-		collection.addHandler(context);
+		taskqueue.server.events.Listener clientRegisteredListener = new CreateClientFolderOnRegister(fm);
+		cm.addUserEventListener(clientRegisteredListener);	
 		
-		context = new ContextHandler("/listclients");
-		context.setHandler(new taskqueue.server.handlers.ListClients());
-		collection.addHandler(context);
 		
-		context = new ContextHandler("/checkauth");
-		context.setHandler(new taskqueue.server.handlers.CheckAuth());
-		collection.addHandler(context);
+		this.addBean(cm);
+		this.addBean(fm);
 		
-		// Creating admin
-		String adminID = this.registerClient();
-		Client admin = this.clientCollection.getClient(adminID);
+		Client admin = cm.getClient(cm.registerClient());
 		admin.flyUpToGod();
 		Log.getLog().info("Admin id is "+admin.getId().toString());
+		
+		
+		ContextHandlerCollection collection = new ContextHandlerCollection();
+		
+		this.createContext(collection,
+				new HelloWorld("<h1> Hello world </h1>"),
+				"/hello");
+		
+		this.createContext(collection,
+				new taskqueue.server.handlers.RegisterClient(),
+				"/register");
+		
+		this.createContext(collection,
+				new taskqueue.server.handlers.ListClients(),
+				"/listclients");
+		
+		this.createContext(collection,
+				new taskqueue.server.handlers.CheckAuth(),
+				"/checkauth");
+		
+		this.createContext(collection,
+				new taskqueue.server.handlers.UploadHandler(),
+				"/upload");
 		
 		this.setHandler(collection);
 	}
 	
-	public void initializeState() {
-		
+	public ContextHandler createContext(ContextHandlerCollection collection, Handler handler, String uri) {
+		ContextHandler context;
+		context = new ContextHandler(uri);
+		context.setHandler(handler);
+		collection.addHandler(context);
+		return context;
 	}
-	
-	public String registerClient() {
-		String newID = this.clientCollection.registerClient();
-		return newID;
-	}
-	
-	public Enumeration<UUID> getAllClients() {
-		return this.clientCollection.getAllClients();
-	}
-	
-	public void respondJSON(JSONAware answer, HttpServletResponse response) throws IOException {
-	    // Declare response encoding and types
-        response.setContentType("application/json; charset=utf-8");
 
-        // Declare response status code
-        response.setStatus(HttpServletResponse.SC_OK);
-        
-        response.getWriter().print(answer);
-	}
-	
-	public void respondHTTP400(HttpServletResponse response) {
-        // Declare response status code
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-	}
-	
-	public Client getClientHeader(HttpServletRequest request) {
-		try {
-			String clientID = request.getHeader("ClientID");
-			Client client = this.clientCollection.getClient(clientID);
-			return client;
-		} catch(Exception e) {
-			Log.getLog().info("Invalid client");
-		}
-		return null;
-		
-	}
-	
 }

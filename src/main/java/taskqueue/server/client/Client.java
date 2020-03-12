@@ -1,21 +1,22 @@
 package taskqueue.server.client;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import taskqueue.server.TaskCollection;
+import taskqueue.server.tasks.AbstractWork;
 
-public class Client {
+public class Client extends AbstractClient{ 
 
-	protected java.util.UUID uuid;
+
 	protected boolean admin = false;
-	protected TaskCollection clientTasks;
+	
 	
 	
 	public Client(java.util.UUID uuid) {
-		this.uuid = uuid;
+		super(uuid);
 	}
 	
-	public java.util.UUID getId() {
-		return this.uuid;
-	}
 	
 	public boolean isAdmin() {
 		return admin;

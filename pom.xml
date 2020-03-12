@@ -19,10 +19,10 @@
 			<version>${jettyVersion}</version>
 		</dependency>
 		<dependency>
-    		<groupId>org.eclipse.jetty</groupId>
-    		<artifactId>jetty-client</artifactId>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-client</artifactId>
 			<version>${jettyVersion}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
