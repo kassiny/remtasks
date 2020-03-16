@@ -20,8 +20,19 @@ public abstract class AbstractClientFrame extends JFrame {
 	protected JButton uploadButton;
 	protected JButton signInButton;
 	protected JButton signUpButton;
+	protected JButton upDateButton;
 	protected JFilePicker fpicker;
 	protected JTextField signinTextField;
+	
+	public JButton getUpDateButton() {
+		return upDateButton;
+	}
+
+
+	public void setUpDateButton(JButton upDateButton) {
+		this.upDateButton = upDateButton;
+	}
+
 	
 	
 	public void setRunner(RunClient runner) {

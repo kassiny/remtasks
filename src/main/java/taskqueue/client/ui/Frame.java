@@ -41,6 +41,7 @@ public class Frame extends AbstractClientFrame {
 	JPanel panelWorks;
 	JList<String> taskList;
 	
+	
 	JTabbedPane tabbedPane;
 	public void initFrame() {
 		
@@ -76,14 +77,21 @@ public class Frame extends AbstractClientFrame {
 		uploadButton.setVisible(true);
 		uploadButton.setEnabled(true);
 		uploadButton.setMinimumSize(new Dimension(40, 20));
+		
 		signinTextField = new JTextField();
 		signinTextField.setText("Enter id here");
 		signinTextField.setColumns(28);
 		signinTextField.setMinimumSize(new Dimension(1300,signinTextField.getMinimumSize().height));
+		
 		signInButton = new JButton();
 		signInButton.setText("Log in");
 		signUpButton = new JButton();
 		signUpButton.setText("Register");
+		
+		upDateButton = new JButton();
+		upDateButton.setText("Update");
+		panelFiles.add(upDateButton);
+		
 		panel.add(signinTextField);
 		panel.add(signInButton);
 		panel.add(signUpButton);
